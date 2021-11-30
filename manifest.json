@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name": "一步",
+  "description": "展示浏览器打开的标签页，一步跳转指定标签页",
+  "version": "1.0.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "one.html"
+  },
+
+  "permissions": [
+    "tabs"
+  ]
+}
