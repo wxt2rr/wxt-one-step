@@ -3,7 +3,7 @@ var favicon_url_regex = /localhost/i;
 var tab_list = [];
 
 // labels
-var $active_label = $('<span class="label label-default">��ǰҳ</span>');
+var $active_label = $('<span class="label label-default">current</span>');
 
 // tab functions
 
@@ -19,6 +19,7 @@ function close_all_tabs(){
       }
       chrome.tabs.remove(tabs_ids);
   });
+  update_total_tabs_count();
 }
 
 function update_total_tabs_count(){
@@ -82,7 +83,7 @@ function add_label(li, tab){
 }
 
 function add_close_button(li, tab_id){
-  var button = $('<button>�ر�</button>');
+  var button = $('<button>close</button>');
   button.attr({class: 'btn btn-warning btn-large', id: tab_id, style: 'float: right;top:1px', title: 'Close tab'});
 
   button.click(function(){
@@ -106,13 +107,39 @@ function create_tab_link(tab){
   add_close_button(li, tab.id);
 
   ul.append(li);
+
+  $("ul#tabs li a").on("click", function(){
+      tab_id = parseInt($(this).attr('id'));
+      go_to_tab(tab_id);
+  });
+}
+
+function sortBy(attr,rev){
+  //第二个参数没有传递 默认升序排列
+    if(rev ==  undefined){
+        rev = 1;
+    }else{
+        rev = (rev) ? 1 : -1;
+    }
+    
+    return function(a,b){
+        a = a[attr];
+        b = b[attr];
+        if(a < b){
+            return rev * -1;
+        }
+        if(a > b){
+            return rev * 1;
+        }
+        return 0;
+    }
 }
 
 // Search functions
 function filter_list(condition) {
   $("#tabs li").remove();
 
-  tab_list.filter(function (t) {
+  tab_list.sort(sortBy("title", true)).filter(function (t) {
     return condition(t);
   }).forEach(function (t) {
     create_tab_link(t);
@@ -144,21 +171,24 @@ $(document).ready(function(){
 
     $("#form-container").on("keyup", "input", function () {
       search_in_tabs($(this).val());
+      update_total_tabs_count();
     });
 
     $("#filter-list").on("click", "span", function (){
       filter_tab_by($(this).data("type"));
+      update_total_tabs_count();
     });
 
     $("ul#tabs li a").on("click", function(){
       tab_id = parseInt($(this).attr('id'));
       go_to_tab(tab_id);
+      update_total_tabs_count();
     });
 
     $('#btn-close-all-tabs').on("click", function(){
       close_all_tabs();
+      update_total_tabs_count();
     });
-
     update_total_tabs_count();
   });
 });
